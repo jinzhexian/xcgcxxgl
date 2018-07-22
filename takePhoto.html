@@ -1,0 +1,460 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="width=device-width,user-scalable=no" name="viewport">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>实验室-相机</title>
+<style type="text/css">
+<!--
+.STYLE1 {	color: #FFFFFF;
+	font-size: 17px;
+	font-family: "黑体";
+}
+.bk {
+	border: 1px solid #0A7E81;
+}
+.STYLE5 {
+	color: #053F40;
+	font-size: 24px;
+	font-family: "黑体";
+}
+.bk {
+	border: 1px solid #99C3C4;
+}
+.STYLE6 {
+	color: #053F40;
+	font-size: 16px;
+	font-family: "黑体";
+}
+body {
+	background-color: #E8F6F7;
+}
+.STYLE7 {
+	color: #FFFFFF;
+	font-weight: bold;
+	font-size: 15px;
+	font-family: "黑体";
+}
+-->
+</style>
+<!--导入cordova的类库-->
+<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+<script type="text/javascript" src="js/uploadFjxx.js"></script>
+<script type="text/javascript" src="js/public.js"></script>
+<script type="text/javascript" src="http://lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js"></script>  
+
+<script>
+    //标识cordova环境是否准备好,初始值为false
+	var deviceReady = false;
+	
+	//页面加载时执行
+    function onLoad(){
+        document.addEventListener("deviceready", onDeviceReady, false);
+    }
+    
+    function onDeviceReady() {
+    	console.log("onDeviceReady()--->start()");
+  		deviceReady = true;
+    	console.log("onDeviceReady()--->end()");
+    }
+	/**
+	*	方法：图片识别
+	*   功能：调用插件，传入 本地 图片 URL 识别途中二维码
+	**/
+	var distinguishIMG ='';
+	function distinguish()
+	{
+
+		//var filetext = document.getElementById("imageSavePath").innerText; 
+		//	var filetext2 = filetext.substr(5,filetext.length);
+		alert("先点拍照，再点 识图： "+distinguishIMG);
+		
+		mam.navigator.ContentCompression.readPicture(successCallback,errorCallback,distinguishIMG);
+
+
+			function successCallback(v)
+			{
+				var path = JSON.stringify(v);
+				alert("图片中二维码信息："+path);
+			}
+			function errorCallback(e)
+			{
+				var error = JSON.stringify(e);
+				alert("errorCallback"+error);
+			}
+
+	}
+
+	/**
+	*
+	*
+	**/
+	var timeOutEvent=0;  
+		$(function(){  
+			$("#touchArea").on({  
+				touchstart: function(e){  
+					timeOutEvent = setTimeout("longPress()",500);  
+					e.preventDefault();  
+				},  
+				touchmove: function(){  
+							clearTimeout(timeOutEvent);   
+						timeOutEvent = 0;   
+				},  
+				touchend: function(){  
+					clearTimeout(timeOutEvent);  
+					if(timeOutEvent!=0){   
+						alert("这是点击，请长按");   
+					}   
+					return false;   
+				}  
+			})  
+		});  
+		  
+		   
+		function longPress(){   
+
+
+			var imgSrc = document.getElementById("touchArea").src;
+			alert("开始识别图片"); 
+
+			timeOutEvent = 0;   		
+		
+			mam.navigator.ContentCompression.readPicture(successCallback,errorCallback,imgSrc);
+
+
+			function successCallback(v)
+			{
+				var path = JSON.stringify(v);
+				alert("图片中二维码信息："+path);
+			}
+			function errorCallback(e)
+			{
+				var error = JSON.stringify(e);
+				alert("errorCallback"+error);
+			}
+		} 
+
+
+		function selectImage()
+		{
+			alert("选择图片");
+			mam.navigator.camera.getPicture(onSuccess3,onError,getCameraOptions3());
+		}
+
+
+	function upload()
+	{
+					alert("建设中。。。");
+
+	/**
+			var fileURI = document.getElementById("imageSavePath").innerText; 
+			var fileURI2 = fileURI.substr(5,fileURI.length);
+			alert("upload1:"+fileURI2);
+			//var upimageURI = imageURI.substr(0,30) + imageURI.substr(30,imageURI.length);
+			//alert("upload:"+imageURI);
+			executeCompress(fileURI2);
+			//var content = "iVBORw0KGgoAAAANSUhEU";
+			//mam.navigator.appupload.appServerUpload(successCallback,errCallback,"appcode_SYS13","UPLOAD","/sdcard/360sicheck.txt",'');	
+			mam.navigator.appupload.appServerUpload(successCallback, errCallback,"appcode_SYS13","upload", fileURI2, "");	
+			function successCallback(obj)
+			{
+				 alert("successCallback");
+			}
+			function errCallback(obj)
+			{
+				 alert("errCallback");
+			}
+			**/
+	}
+
+    
+  	//清除界面上的数据
+	function clearData(){
+		console.log("clear()");
+		//清除图片
+		var backImage = document.getElementById('backImage');
+		backImage.style.display = 'none';
+		backImage.src = '';
+		distinguishIMG ='';
+		
+		var backImageUri = document.getElementById('imageSavePath');
+		backImageUri.innerHTML = "图片路径存放在此处";
+	}
+    
+	function takePhoto(){
+		console.log("test()--->start()");
+		if(!deviceReady){
+			//执行到这边表示cordova环境没有准备好
+			return;
+		}
+		
+		//使用这边调用可以获取图像URL[和下面的只能调用一个方法]
+		mam.navigator.camera.getPicture(onSuccess,onError,getCameraOptions());
+		
+		//使用这边调用可以获取图像数据[和上面的只能调用一个方法]
+		//mam.navigator.camera.getPicture(onSuccess2,onError,getCameraOptions2());
+		
+		function onSuccess(imageURI){
+			console.log("onSuccess() imageURI:" + imageURI);
+			alert("onSuccess() imageURI:" + imageURI);
+			//从这边返回数据
+			var backImage = document.getElementById('backImage');
+			backImage.style.display = 'block';
+			backImage.src = imageURI;
+			
+			distinguishIMG=imageURI;
+
+
+			var backImageUri = document.getElementById('imageSavePath');
+			backImageUri.innerHTML = "图片路径:" + imageURI.substr(0,30) + "<br/>" + imageURI.substr(30,imageURI.length);
+		}
+		
+		function onSuccess2(imageData){
+			console.log("onSuccess2() imageData:" + imageData);
+			//从这边返回数据
+			var backImage = document.getElementById('backImage');
+			backImage.style.display = 'block';
+			var allData = "data:image/jpeg;base64," + imageData;
+			backImage.src = allData;
+			
+			var backImageUri = document.getElementById('imageSavePath');
+			//backImageUri.innerHTML = "图片数据:" + allData;
+		}
+		
+		//参数为string类型
+		function onError(cameraError){
+			console.log("onError() cameraError:" + cameraError);
+			alert("onError() cameraError:" + cameraError);
+		}
+		console.log("test()--->end()");
+	}
+	   function onSuccess3(imageURI){
+			
+			console.log("onSuccess() imageURI:" + imageURI);
+			alert("onSuccess() imageURI:" + imageURI);
+			//从这边返回数据
+			var backImage = document.getElementById('backImage');
+			backImage.style.display = 'block';
+			backImage.src = imageURI;
+			
+			distinguishIMG=imageURI;
+
+
+			var backImageUri = document.getElementById('imageSavePath');
+			backImageUri.innerHTML = "图片路径:" + imageURI.substr(0,30) + "<br/>" + imageURI.substr(30,imageURI.length);
+		}
+	
+
+
+
+		//参数为string类型
+		function onError(cameraError){
+			console.log("onError() cameraError:" + cameraError);
+			alert("onError() cameraError:" + cameraError);
+		}
+	
+	//获取相机操作参数,参数被封装在了json对象cameraOptions中了
+	//参数说明
+	//quality:取值为[0-100],表示图片质量，取值越低图片质量越差
+	//destinationType:返回值的类型，取值如下
+	//   Camera.DestinationType.DATA_URL:返回图片作为base64编码字符串
+	//   Camera.DestinationType.FILE_URL:返回图片作为文件的URI
+	//   Camera.DestinationType.NATIVE_URI:返回图片作为本地的URI{ios中assets-library://,android中content://}
+	//sourceType:图片源类别
+	//   Camera.PictureSourceType.PHOTOLIBRARY:图片库中
+	//   Camera.PictureSourceType.CAMERA:从摄像机获取图片
+	//   Camera.PictureSourceType.SAVEDPHOTOALBUM:已保存的相册
+	//targetWidth:图片的宽度和高度
+	//  用法:android中根据这个值来计算simpleSize
+	//  未指定:如果设定的值<1默认后台插件设定成-1
+	//targetHeight:
+	//  指定:如果设定的值<1默认后台插件设定成-1
+	
+	//allowEdit:是否允许编辑[在android中此值没有起到作用，其它平台请参考插件源码]
+	//encodingType:返回图片的格式
+	//   Camera.EncodingType.JPEG{取值为0,表示返回JPEG格式的图片}
+	//   Camera.EncodingType.PNG{取值为1,表示返回PNG格式的图片}
+	//targetWidth:图片缩放宽度，以像素为单位
+	//targetHeight:图片缩放高度，以像素为单位
+	//mediaType:媒体类别，选择媒体的类别，sourceType:Camera.PictureSourceType.PHOTOLIBRARY/sourceType:Camera.PictureSourceType.SAVEDPHOTOALBUM
+	//          值时，为此对象设定的值才有效。
+	//         android中:sourceType的取值Camera.PictureSourceType.PHOTOLIBRARY和Camera.PictureSourceType.SAVEDPHOTOALBUM是一样的
+	//mediaType取值:
+	//        Camera.MediaType.PICTURE:[取值为0]表示选择图片
+	//        Camera.MediaType.VIDEO:[取值为0]表示选择视屏
+	//        Camera.MediaType.ALLMEDIA:[取值为0]表示为所有媒体
+	//correctOrientation:正确的方向，旋转图片到正确的方向
+	//saveToPhotoAlbum:是否保存到相册
+	//   saveToPhotoAlbum取值:ture/false
+	//popoverOptions:仅ios设备此值设定有效[对android或其它设备此属性无效]
+	//cameraDirection:摄像头方向
+	// Camera.Direction.BACK:后置摄像头
+	// Camera.Direction.FRONT:前置摄像头
+	function getCameraOptions(){
+		var cameraOptions = { 
+			 quality : 100,
+ 			 destinationType:mam.navigator.camera.DestinationType.FILE_URI,
+  			 sourceType : mam.navigator.camera.PictureSourceType.CAMERA,
+  			 targetWidth: 1600,
+             targetHeight: 1200,
+             //allowEdit : true,
+             encodingType:Camera.EncodingType.JPEG,
+             saveToPhotoAlbum: true
+            };
+		return  cameraOptions;     
+	}
+	
+	function getCameraOptions2(){
+		var cameraOptions = { 
+			 quality : 100,
+ 			 destinationType:mam.navigator.camera.DestinationType.DATA_URL,
+  			 sourceType : mam.navigator.camera.PictureSourceType.CAMERA,
+  			 targetWidth: 0,
+             targetHeight: 0,
+             //allowEdit : true,
+             encodingType:Camera.EncodingType.JPEG,
+             saveToPhotoAlbum: true
+            };
+		return  cameraOptions;     
+	}
+
+	//打开本地相册
+	function getCameraOptions3(){
+		var cameraOptions = { 
+			 quality : 100,
+ 			 destinationType:mam.navigator.camera.DestinationType.NATIVE_URI,
+  			// sourceType : mam.navigator.camera.PictureSourceType.PHOTOLIBRARY,
+			 sourceType : mam.navigator.camera.PictureSourceType.SAVEDPHOTOALBUM,
+  			 targetWidth: 0,
+             targetHeight: 0,
+             //allowEdit : true,
+             encodingType:Camera.EncodingType.JPEG,
+             saveToPhotoAlbum: true
+            };
+		return  cameraOptions;     
+	}
+	
+</script>
+
+</head>
+
+<body onload="onLoad();">
+<table width="98%" border="0" align="center" cellpadding="0" cellspacing="0" onclick="takePhoto()">
+  <tr>
+    <td bgcolor="#0A7E81"><table width="100%" border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <td width="31%" height="60" align="right"><img src="images/photo.png" width="72" height="50" /></td>
+        <td width="69%">
+        	<span class="STYLE1">我要拍照</span>
+        </td>
+      </tr>
+    </table></td>
+  </tr>
+</table>
+<br />
+<table width="98%" border="0" align="center" cellpadding="0" cellspacing="0" onclick="selectImage()">
+  <tr>
+    <td bgcolor="#0A7E81"><table width="100%" border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <td width="31%" height="60" align="right"><img src="images/photo.png" width="72" height="50" /></td>
+        <td width="69%">
+        	<span class="STYLE1">选择图片</span>
+        </td>
+      </tr>
+    </table></td>
+  </tr>
+</table>
+<br />
+<table width="98%" border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#D0E8EA">
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><table width="95%" border="0" align="center" cellpadding="0" cellspacing="0">
+      <tr>
+        <td height="200" bgcolor="#0A7E81" align="center">
+        	<!-- 图片显示或隐藏 -->
+        	<img style="display:none;" id="backImage" src="" width="150px" height="200px"/>
+        </td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><table width="90%" border="0" align="center" cellpadding="0" cellspacing="0">
+      <tr>
+        <td height="30">
+        </td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td><table width="90%" border="0" align="center" cellpadding="0" cellspacing="0" class="bk">
+      <tr>
+        <td height="30" align="left" >
+        	<span id="imageSavePath" class="STYLE6">图片路径存放此处..</span>
+        </td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+<br />
+<table width="98%" border="0" align="center" cellpadding="0" cellspacing="0">
+  <tr>
+   <td height="30" align="right">
+    	<table width="120" border="0" cellspacing="0" cellpadding="0" onclick="upload()" bgcolor="#0A7E81">
+      		<tr>
+        		<td height="46" align="center" >
+        			<span class="STYLE7">上传</span>
+        		</td>
+      		</tr>
+    	</table>      
+    </td>
+    <td height="30" align="right">
+    	<table width="120" border="0" cellspacing="0" cellpadding="0" onclick="clearData()" bgcolor="#0A7E81">
+      		<tr>
+        		<td height="46" align="center" >
+        			<span class="STYLE7">清除</span>
+        		</td>
+      		</tr>
+    	</table>      
+    </td>
+
+	 <td height="30" align="right">
+    	<table width="120" border="0" cellspacing="0" cellpadding="0" onclick="distinguish()" bgcolor="#0A7E81">
+      		<tr>
+        		<td height="46" align="center" >
+        			<span class="STYLE7">识图</span>
+        		</td>
+      		</tr>
+    	</table>      
+    </td>
+  </tr>
+</table>
+<p><br />
+</p>
+
+
+<table width="98%" border="0" align="center" cellpadding="0" cellspacing="0">
+  <tr>
+    <td bgcolor="#0A7E81"><table width="100%" border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <td width="31%" height="60" align="right"><img ID = 'touchArea' src="https://mam1.ft-power.com.cn:10030/html8/dlydt.png" width="100" height="100" /></td>
+        <td width="69%">
+        	<span class="STYLE1">长按图片，识别图中二维码</span>
+        </td>
+      </tr>
+    </table></td>
+  </tr>
+</table>
+<br />
+
+
+
+</body>
+</html>

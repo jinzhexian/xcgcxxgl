@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="width=device-width,user-scalable=no" name="viewport">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>实验室-位置定位</title>
+<script src="js/jquery-1.9.1.min.js"></script><style type="text/css"></style>
+<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+<script src="js/public.js"></script>
+<style type="text/css">
+body {
+	background-color: #E8F6F7;
+}
+.STYLE2 {
+	font-family: "黑体";
+	color: #FFFFFF;
+}
+.STYLE4 {color: #FFFFFF; font-weight: bold; font-family: "黑体"; font-size: 14pt; }
+.BK {
+	border: 1px solid #0A7E81;
+}
+.BK2 {
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: none;
+	border-left-style: solid;
+	border-top-color: #E8F6F7;
+	border-right-color: #E8F6F7;
+	border-left-color: #E8F6F7;
+}
+.BK3 {
+	border-bottom-width: 1px;
+	border-bottom-style: none;
+	border-bottom-color: #0A7E81;
+	border-top-width: 1px;
+	border-top-style: dashed;
+	border-top-color: #0A7E81;
+}
+.BK4 {
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-right-style: solid;
+	border-bottom-color: #E8F6F7;
+	border-top-width: 1px;
+	border-left-width: 1px;
+	border-right-width: 1px;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-top-color: #E8F6F7;
+	border-left-color: #E8F6F7;
+	border-right-color: #E8F6F7;
+}
+.textareaStyle1{min-height:40px;border:1px solid #88b8b9;color:#0a7e81;padding:8px;-webkit-box-sizing:border-box;box-sizing:border-box; line-height:120%;width:100%;}
+</style>
+<script type="text/javascript"> 	
+	
+	//标识cordova环境是否准备好,初始值为false
+    var ready = false;
+    
+    function onDeviceReady() {
+    	console.log("onDeviceReady()111--->start()");
+  		ready = true;
+		getLocation(mam.navigator.geolocation);
+    	console.log("onDeviceReady()222--->end()");
+    }	
+	
+	  /**
+     * Get current location
+     */
+    var getLocation = function(geo, opts) {
+        console.log("getLocation()");
+		
+        // Success callback
+        var success = function(p){
+            console.log('get location success');            
+            lat=p.coords.latitude;
+			lng=p.coords.longitude;
+			var addr = p.address;			
+			$('#latitude').html(lng);
+			$('#longitude').html(lat);			
+            document.getElementById('textarea').value = "位置信息："+addr;			
+        };
+
+        // Fail callback
+        var fail = function(e){
+            console.log("getLocation fail callback with error code "+e.code);
+        };
+
+        // Get location
+        geo.getCurrentPosition(success, fail, opts || {enableHighAccuracy: true}); //, {timeout: 10000});
+
+    };
+	
+	function locate(){
+		getLocation(mam.navigator.geolocation);
+	}    
+
+
+	function clearDataN(){
+		document.getElementById("latitude1").innerHTML = '';
+		document.getElementById("longitude1").innerHTML = '';
+		document.getElementById("textarea1").value = '';		
+	}
+
+	function clearData(){
+		document.getElementById("latitude").innerHTML = '';
+		document.getElementById("longitude").innerHTML = '';
+		document.getElementById("textarea").value = '';		
+	}
+
+	
+
+	function locate2 (){
+	//	alert('调用mam.navigator.gps.getLocation ')
+		/**
+		*坐标系：
+		*    IOS：gps、bd0911
+		*Android：gps、bd0911、gcj02
+		**/
+		mam.navigator.gps.getLocation(successCallback,errorCallback,"bd09ll");
+	}
+	function successCallback(v){
+	alert('successCallback'+JSON.stringify(v))          
+	 lat1=v.latitude;
+	 lng1=v.longitude;
+	 var addr1 = v.address;			
+	 $('#latitude1').html(lng1);
+	 $('#longitude1').html(lat1);
+
+	 alert('addr1   :'+addr1)          
+	 document.getElementById('textarea1').value = "位置信息："+addr1;		
+	}
+
+	function errorCallback(e){
+
+		alert("GPS信息获取失败"+JSON.stringify(e));		
+	}
+
+	
+</script>
+</head>
+
+<body>
+
+<span>平台提供（推荐）</span><br>
+<span>坐标系：</span><br>
+<span>IOS：gps、bd0911</span><br>
+<span>Android：gps、bd0911、gcj02</span><br>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bordercolor="#E8F6F7" bgcolor="#FFFFFF" class="BK">
+  <tr>
+    <td height="42" width="15%" align="center" bgcolor="#0A7E81" class="BK2">
+    	<span class="STYLE2">经度：</span>
+    </td>
+    <td class="BK3" width="60%" id="latitude1"></td>
+  </tr>
+  <tr>
+    <td height="42" width="15%" align="center" bgcolor="#0A7E81" class="BK4">
+    	<span class="STYLE2">纬度：</span>
+    </td>
+    <td class="BK3" id="longitude1"></td>
+  </tr>
+</table>
+
+
+<div class="space10"></div> 
+<textarea class="textareaStyle1" id="textarea1"  readonly="readonly" onfocus="if(value=='位置信息'){value=''}" onblur="if (value ==''){value='位置信息'}">位置信息</textarea>		
+<div class="space10"></div>			
+
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="25%">&nbsp;</td>
+    <td width="45%">
+    <table width="130" border="1" cellpadding="0" cellspacing="0" bordercolor="#FFFFFF" bgcolor="#0A7E81" onclick="locate2()">
+      <tr>
+        <td height="50" align="center"><span class="STYLE4">获取当前位置</span></td>
+      </tr>
+    </table>
+    </td>
+    <td width="30%"><table width="80" border="1" cellpadding="0" cellspacing="0" bordercolor="#FFFFFF" bgcolor="#0A7E81"
+    	onclick="clearDataN()">
+      <tr>
+        <td height="50" align="center"><span class="STYLE4">清除</span></td>
+      </tr>
+    </table></td>
+  </tr>
+</table>
+<br>
+
+
+
+
+
+<!--*******************************-->
+
+
+
+
+
+
+
+<span>Cordova 原生插件（不推荐）</span>
+<br>
+<span>android 使用Google坐标系</span>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bordercolor="#E8F6F7" bgcolor="#FFFFFF" class="BK">
+  <tr>
+    <td height="42" width="15%" align="center" bgcolor="#0A7E81" class="BK2">
+    	<span class="STYLE2">经度：</span>
+    </td>
+    <td class="BK3" width="60%" id="latitude"></td>
+  </tr>
+  <tr>
+    <td height="42" width="15%" align="center" bgcolor="#0A7E81" class="BK4">
+    	<span class="STYLE2">纬度：</span>
+    </td>
+    <td class="BK3" id="longitude"></td>
+  </tr>
+</table>
+
+
+<div class="space10"></div> 
+<textarea class="textareaStyle1" id="textarea"  readonly="readonly" onfocus="if(value=='位置信息'){value=''}" onblur="if (value ==''){value='位置信息'}">位置信息</textarea>		
+<div class="space10"></div>			
+
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="25%">&nbsp;</td>
+    <td width="45%">
+    <table width="130" border="1" cellpadding="0" cellspacing="0" bordercolor="#FFFFFF" bgcolor="#0A7E81" onclick="locate()">
+      <tr>
+        <td height="50" align="center"><span class="STYLE4">获取当前位置</span></td>
+      </tr>
+    </table>
+    </td>
+    <td width="30%"><table width="80" border="1" cellpadding="0" cellspacing="0" bordercolor="#FFFFFF" bgcolor="#0A7E81"
+    	onclick="clearData()">
+      <tr>
+        <td height="50" align="center"><span class="STYLE4">清除</span></td>
+      </tr>
+    </table></td>
+  </tr>
+</table>
+<br>
+
+
+
+
+
+
+
+
+
+
+
+   
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
